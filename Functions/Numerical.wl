@@ -38,6 +38,10 @@ ArcSecD::usage = "Inverse trigonometric function that outputs in degrees";
 
 ArcCscD::usage = "Inverse trigonometric function that outputs in degrees";
 
+nCr:: Simplified notation Combinations
+
+nPr:: Simplified notation Permutations
+
 
 (* ::Section:: *)
 (*Begin*)
@@ -290,8 +294,25 @@ ArcCotD[d_] :=
     FullSimplify @ (ArcCot[d] / \[Degree]);
 
 
+(* ::Subsubsection:: *)
+(*Attributes and Options*)
+
+
+(* ::Subsection:: *)
+(*Combinatorics*)
+
+nCr[n_,r_] :=
+    FullSimplify @ ((n!)/(r!(n-r)!));
+
+nPr[n_,r_] :=
+    FullSimplify @ ((n!)/((n-r)!));
+
+
 (* ::Section:: *)
 (*End*)
+
+
+
 
 
 End[]
