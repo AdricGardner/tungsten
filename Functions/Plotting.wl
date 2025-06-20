@@ -4,19 +4,17 @@
 (*Usage*)
 
 
-VecPlot::usage = "Plots a list of vectors on an i,j plane.";
+DetailBase::usage = "Returns the components required for DetailPlot. (Helper function)";
 
-DetailBase::usage = "Returns the components required for DetailPlot.";
+RelationBase::usage = "Returns the components required for RelationPlot. (Helper function)";
 
-RelationBase::usage = "Returns the components required for RelationPlot.";
+CalloutCoordinate::usage = "Applies a callout to a point.  (Helper function)";
 
-CalloutCoordinate::usage = "Applies a callout to a point.";
-
-CRBase::usage = "Returns the components required for CRPlot.";
+CRBase::usage = "Returns the components required for CRPlot.  (Helper function)";
 
 DetailPlot::usage = "Plots asymptotes and other important details of a graph.";
 
-TooltipCoordinate::usage = "Creates a tooltip expression for a list of coordinates.";
+TooltipCoordinate::usage = "Creates a tooltip expression for a list of coordinates. (Helper function)";
 
 RelationPlot::usage = "Plots relations returning axial intercepts.";
 

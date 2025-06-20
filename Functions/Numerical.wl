@@ -63,10 +63,36 @@ Begin["`Private`"]
 
 
 Newton[fx_, x_, x0_, iter_] :=
-    Module[{g},
-        g[y_] := fx /. {x -> y};
-        NestList[# - g[#] / g'[#]&, x0, iter]
-    ]
+DynamicModule[{step = 1, fxInput = "x^2 - 2", xVarStr = "x", xSym, 
+  fxParsed, x0 = 1.0, iter = 5, newtonResult = ""}, 
+ Dynamic[Panel@
+   Column[{Style["Newton's Method Wizard", Bold, 16], 
+     Which[step == 1, 
+      Column[{Style["Step 1: Enter the function f(x)", Bold], 
+        Row[{"f(x): ", InputField[Dynamic[fxInput], String]}], 
+        Row[{"Variable: ", InputField[Dynamic[xVarStr], String]}], 
+        Button["Next", (Quiet[xSym = ToExpression[xVarStr];
+           fxParsed = ToExpression[fxInput];
+           step = 2;])]}], step == 2, 
+      Column[{Style["Step 2: Initial Guess and Iterations", Bold], 
+        Row[{"Initial guess x₀: ", InputField[Dynamic[x0], Number]}], 
+        Row[{"Number of iterations: ", 
+          InputField[Dynamic[iter], Number]}], 
+        Button["Compute", 
+         Module[{f, df, current, rows, tangent, intercept}, 
+          f[y_] := fxParsed /. {xSym -> y};
+          df[y_] := D[fxParsed, xSym] /. {xSym -> y};
+          current = x0;
+          rows = {{"x", "Tangent Line", "Intercept"}};
+          Do[tangent = TangentLine[f[x], x, current, y];
+           intercept = current - f[current]/df[current];
+           AppendTo[rows, {current, tangent, intercept}];
+           current = intercept;, {i, iter}];
+          newtonResult = Grid[rows, Frame -> All];
+          step = 3;]]}], step == 3, 
+      Column[{Style["Step 3: Newton Iteration Table", Bold], 
+        Dynamic[newtonResult], Button["Start Over", (step = 1)]}]]}]]]
+
 
 
 (* ::Subsubsection:: *)
@@ -81,37 +107,38 @@ Newton[fx_, x_, x0_, iter_] :=
 (*Euler*)
 
 
-Euler[f_, {varx_, vary_}, {xo_, yo_}, h_, xF_] :=
-    TableForm @
-        Join[
-            {{ToString[varx], ToString[vary]}}
-            ,
-            NestWhileList[
-                Function[pointxy,
-                    pointxy +
-                        {
-                            h
-                            ,
-                            h *
-                                Apply[
-                                    Function[{varx, vary},
-                                        f
-                                    ]
-                                    ,
-                                    pointxy
-                                ]
-                        }
-                ]
-                ,
-                {xo, yo}
-                ,
-                If[h > 0,
-                    #[[1]] < xF&
-                    ,
-                    #[[1]] > xF&
-                ]
-            ]
-        ];
+Euler[] :=
+DynamicModule[{step = 1, fInput = "x + y", varx = "x", vary = "y", 
+  xo = 0, yo = 1, h = 0.1, xF = 1, eulerResult = "", parsedF, xSym, 
+  ySym}, Dynamic[
+  Panel@Column[{Style["Euler's Method Wizard", Bold, 16], 
+     Which[step == 1, 
+      Column[{Style["Step 1: Enter the function f(x, y)", Bold], 
+        Row[{"f(x, y): ", InputField[Dynamic[fInput], String]}], 
+        Row[{"Variable for x: ", InputField[Dynamic[varx], String]}], 
+        Row[{"Variable for y: ", InputField[Dynamic[vary], String]}], 
+        Button["Next", (xSym = ToExpression[varx];
+          ySym = ToExpression[vary];
+          parsedF = ToExpression[fInput];
+          step = 2;)]}], step == 2, 
+      Column[{Style["Step 2: Enter Initial Conditions", Bold], 
+        Row[{"x₀: ", InputField[Dynamic[xo], Number]}], 
+        Row[{"y₀: ", InputField[Dynamic[yo], Number]}], 
+        Row[{"Step size h: ", InputField[Dynamic[h], Number]}], 
+        Row[{"Final x value: ", InputField[Dynamic[xF], Number]}], 
+        Button["Compute", (eulerResult = 
+           TableForm@
+            Join[{{varx, vary}}, 
+             NestWhileList[
+              Function[pt, 
+               pt + {h, 
+                 h*Evaluate[
+                   parsedF /. {xSym -> pt[[1]], 
+                    ySym -> pt[[2]]}]}], {xo, yo}, 
+              If[h > 0, #[[1]] < xF &, #[[1]] > xF &]]];
+          step = 3;)]}], step == 3, 
+      Column[{Style["Step 3: Euler Result Table", Bold], 
+        Dynamic[eulerResult], Button["Start Over", (step = 1)]}]]}]]]
 
 
 (* ::Subsubsection:: *)
